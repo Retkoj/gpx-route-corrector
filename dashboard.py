@@ -73,7 +73,7 @@ st.header('Corrected GXP')
 
 corrected_data_path = Path('./data/corrected')
 file_path = Path(file_path)
-corrected_file_path = corrected_data_path / (file_path.stem + '_gecorrigeerd.gpx')
+corrected_file_path = corrected_data_path / (file_path.stem + '_corrected.gpx')
 if corrected_file_path.exists():
     corrected_df = get_gpx_points(corrected_file_path)
 
