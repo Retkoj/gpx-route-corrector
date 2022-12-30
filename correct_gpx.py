@@ -1,6 +1,8 @@
+from pathlib import Path
+
 from gpxpy.gpx import GPX
 
-from read_gpx import get_gpx_points, parse_gpx_file
+from read_gpx import parse_gpx_file
 
 import gpxpy.gpx
 
@@ -18,35 +20,26 @@ def create_new_gpx():
     return new_gpx
 
 
-# print(gpx.to_xml())
 def save_gpx(file_name: str, gpx: GPX):
-    with open(f'./data/{file_name}_gecorrigeerd.gpx', 'w') as f:
+    Path('./data/corrected/').mkdir(parents=True, exist_ok=True)
+    with open(f'./data/corrected/{file_name}_gecorrigeerd.gpx', 'w') as f:
         f.write(gpx.to_xml())
 
 
-def filter_points(gpx: GPX, cutoff_max_lat: float):
+def filter_points(gpx: GPX, exclude_lower_bound, exclude_upper_bound):
     new_gpx = create_new_gpx()
     for track in gpx.tracks:
         for segment in track.segments:
-            for point in segment.points:
-                if point.latitude < cutoff_max_lat:
+            for index, point in enumerate(segment.points):
+                # If point not in exluding bounds, add point
+                if index < exclude_lower_bound or index > exclude_upper_bound:
                     new_gpx.tracks[0].segments[0].points.append(point)
     return new_gpx
 
 
-def remove_points(file: str, cutoff_max_lat=52.01):
+def correct_gpx_file(file_path, exclude_lower_bound, exclude_upper_bound):
+    file_name = Path(file_path).stem
     gpx = parse_gpx_file(file_path)
-    points = get_gpx_points(file)
-    df = points[points['latitude'] < cutoff_max_lat]
+    filtered_gpx = filter_points(gpx, exclude_lower_bound, exclude_upper_bound)
+    save_gpx(file_name, filtered_gpx)
 
-    # Create points:
-    for idx in df.index:
-        gpx_segment.points.append(gpx.GPXTrackPoint(df.loc[idx, 0], df.loc[idx, 1]))
-
-    print(df)
-
-
-if __name__ == '__main__':
-    gpx = parse_gpx_file('./data/Middagloop_12072022.gpx')
-    filtered_gpx = filter_points(gpx, 52.01)
-    save_gpx('Middagloop_12072022', filtered_gpx)

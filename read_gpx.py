@@ -16,12 +16,13 @@ def extract_points(gpx):
     gpx_points = []
     for track in gpx.tracks:
         for segment in track.segments:
-            for point in segment.points:
+            for index, point in enumerate(segment.points):
                 gpx_points.append({
                     'latitude': point.latitude,
                     'longitude': point.longitude,
                     'elevation': point.elevation,
-                    'timestamp': point.time
+                    'timestamp': str(point.time),
+                    'index': index
                 })
     return pd.DataFrame(gpx_points)
 
@@ -39,4 +40,8 @@ def get_gpx_points(file_path):
 #         print('Point at ({0},{1}) -> {2}'.format(point.latitude, point.longitude, point.elevation))
 
 
-
+if __name__ == '__main__':
+    file_name = './data/Middagloop.gpx'
+    gpx = parse_gpx_file(file_name)
+    points = extract_points(gpx)
+    print(points)
