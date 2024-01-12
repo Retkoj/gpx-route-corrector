@@ -1,3 +1,4 @@
+from geopy.distance import geodesic
 import gpxpy.gpx
 import pandas as pd
 
@@ -40,6 +41,25 @@ def extract_points(gpx):
                     'index': index
                 })
     return pd.DataFrame(gpx_points)
+
+
+def get_distance(file_path):
+    """
+    Calculates the total distance of the gpx path in file_path in km.
+
+    :param file_path: Path to gpx file
+    :return: distance in km
+    """
+    gpx = parse_gpx_file(file_path)
+    distance = 0
+    prev_point = None
+    for track in gpx.tracks:
+        for segment in track.segments:
+            for index, point in enumerate(segment.points):
+                if prev_point:
+                    distance += geodesic(prev_point, (float(point.latitude), float(point.longitude))).km
+                prev_point = (float(point.latitude), float(point.longitude))
+    return distance
 
 
 def get_gpx_points(file_path):

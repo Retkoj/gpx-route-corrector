@@ -5,7 +5,7 @@ import streamlit as st
 import pydeck as pdk
 
 from correct_gpx import correct_gpx_file
-from read_gpx import get_gpx_points
+from read_gpx import get_gpx_points, get_distance
 
 st.header('GPX')
 
@@ -15,6 +15,9 @@ files = os.listdir(data_path)
 file_name = st.selectbox('Select a GPX file', files)
 file_path = os.path.join(data_path, file_name)
 df = get_gpx_points(file_path)
+distance = get_distance(file_path)
+
+st.text(f"Total distance: {distance} km")
 
 st.pydeck_chart(pdk.Deck(
     map_style='mapbox://styles/mapbox/light-v9',
